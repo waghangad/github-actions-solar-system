@@ -1,4 +1,4 @@
-name: Configure Code Coverage
+name: Solar System Workflow
 
 on: 
   workflow_dispatch:
