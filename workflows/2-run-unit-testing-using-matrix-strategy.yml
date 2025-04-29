@@ -1,4 +1,4 @@
-name: Matrix Strategy
+name: Solar System Workflow
 
 on: 
   workflow_dispatch:
