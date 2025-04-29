@@ -32,12 +32,6 @@ jobs:
       with:
         node-version: ${{ matrix.nodejs_version }}
     
-    - name: Cache NPM Dependancy
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json')}}
-     
     - name: Install Dependencies
       run: npm install
 
@@ -46,7 +40,9 @@ jobs:
       run: npm test
       
     - name: Archive Test Result
-      if: steps.unit_testing_step.outcome == 'falure' || 'success'
+      # if: failure() # Run this step even if previous step failed.
+      # if: always()  # Always run this step even if previous step successfull or failure.
+      if: steps.unit_testing_step.outcome == 'falure' || 'success'  # Similar to if: always()
       uses: actions/upload-artifact@v4
       with:
         name: Test-Result-${{ matrix.nodejs_version }}-${{ matrix.os }}- ${{ github.run_id }}
@@ -64,12 +60,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
-
-    - name: Cache NPM Dependancy
-      uses: actions/cache@v3
-      with:
-        path: node_modules
-        key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json')}}
     
     - name: Install Dependencies
       run: npm install
