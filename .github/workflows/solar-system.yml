@@ -6,6 +6,9 @@ on:
     branches:
       - main
       - 'feature/*'
+permissions:
+  id-token: write
+  contents: read
     
 env:
   MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
@@ -88,6 +91,7 @@ jobs:
 
   docker:
     name: containerization
+    Needs:[unit-testing, code-coverage]
     runs-on:  ubuntu-latest
     steps:
     - name: Checkout Repo
