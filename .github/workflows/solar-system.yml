@@ -197,7 +197,7 @@ jobs:
         tokenSuffix: '_}_'
         files: '["kubernetes/development/*.yaml"]'
       env:
-        NAMESPACE: devlopment
+        NAMESPACE: development
         REPLICAS: 2
         IMAGE: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}
 
