@@ -14,6 +14,8 @@ env:
   MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
   MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
+  REPOSITORY: study/demo-repo
+  REGISTRY: ${{ steps.login-ecr.outputs.registry }}
 
 jobs:
   unit-testing:
@@ -110,20 +112,19 @@ jobs:
       with:
         mask-password: true
 
-    - name: Build, tag, and push docker image to Amazon ECR
-      env:
-        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: study/demo-repo
+    - name: Build, and tag docker image.
+      # env:
+      #   REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        
       uses: docker/build-push-action@v6
       with:
         context: .
         push: false
         tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}
 
-    - name: Docker Image Testing
-      env:
-        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: study/demo-repo
+    - name: Test docker image
+      # env:
+      #   REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       run: |
         docker images
         docker run --name solar-system-app -d \
