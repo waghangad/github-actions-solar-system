@@ -9,15 +9,12 @@ on:
 permissions:
   id-token: write
   contents: read
-  packages: write
-    
+  packages: write   
 env:
   MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
   MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
   REPOSITORY: study/demo-repo
-  EKS_CLUSTER_NAME: 'demo-eks-cluster'
-  REGISTRY: '992293216837.dkr.ecr.ap-south-1.amazonaws.com/study/demo-repo'
 
 jobs:
   unit-testing:
@@ -130,13 +127,6 @@ jobs:
       with:
         mask-password: true
 
-    - name: Login to GHCR
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ github.token}}
-
     - name: Build, and tag docker image.
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -147,6 +137,8 @@ jobs:
         tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}
 
     - name: Test docker image
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       run: |
         docker images
         docker run --name solar-system-app -d \
@@ -163,43 +155,12 @@ jobs:
         wget -q -O - 127.0.0.1:3000/live | grep live
 
     - name: Push docker image.
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       uses: docker/build-push-action@v6
       with:
         context: .
         push: true
         tags: |
           ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}
-
-
-  dev-deploy:
-    runs-on: ubuntu-latest
-    needs: docker
-    steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v4
-
-    - name: Install kubectl
-      uses: azure/setup-kubectl@v4
-
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        audience: sts.amazonaws.com
-        aws-region: ap-south-1
-        role-to-assume: arn:aws:iam::992293216837:role/github-action-oidc-Role-xta7NbBBHjdI
-        
-    - name: Update kubeconfig for EKS
-      run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }}
-
-    - uses: cschleiden/replace-tokens@v1
-      with:
-        tokenPrefix: '_{_'
-        tokenSuffix: '_}_'
-        files: '["kubernetes/development/*.yaml"]'
-      env:
-        NAMESPECE: devlopment
-        REPLICAS: 2
-        IMAGE: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}
-
-    - name: Check Files
-      run: cat kubernetes/development/*.yaml
+         
