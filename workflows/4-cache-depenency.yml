@@ -1,3 +1,5 @@
+# Cache will automatically get invalidated once new package added into project.
+
 name: Solar System Workflow
 
 on: 
@@ -17,7 +19,7 @@ jobs:
     strategy:
       matrix:
         nodejs_version: [18,20]
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         exclude:
           - nodejs_version: 18
             os: macos-latest
@@ -84,5 +86,3 @@ jobs:
         name: code-coverage-result
         path: coverage
         retention-days: 5
-
-        

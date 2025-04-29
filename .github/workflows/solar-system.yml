@@ -85,4 +85,49 @@ jobs:
         path: coverage
         retention-days: 5
 
+
+  docker:
+    name: containerization
+    runs-on:  ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        audience: sts.amazonaws.com
+        aws-region: ap-south-1
+        role-to-assume: arn:aws:iam::992293216837:role/github-action-oidc-Role-xta7NbBBHjdI
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        mask-password: true
+
+    - name: Build, tag, and push docker image to Amazon ECR
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: study/demo-repo
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: false
+        tags: $REGISTRY/${{ env.REPOSITORY }}:${{ github.sha }}
+
+    - name: Docker Image Testing
+      run: |
+        docker images
+        docker run --name solar-system-app -d \
+          -p 3000:3000 \
+          -e MONGO_URI=$MONGO_URI \
+          -e MONGO_USERNAME=$MONGO_USERNAME \
+          -e MONGO_PASSWORD=$MONGO_PASSWORD \
+          $REGISTRY/${{ env.REPOSITORY }}:${{ github.sha }}
         
+        export IP=$(docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+        echo $IP
+
+        echo Testing Image URL using wget
+        wget -q -o - 127.0.0.1:3000/live | grep live
