@@ -9,6 +9,7 @@ on:
 permissions:
   id-token: write
   contents: read
+  packages: write
     
 env:
   MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
@@ -20,7 +21,7 @@ jobs:
   unit-testing:
     strategy:
       matrix:
-        nodejs_version: [18,20]
+        nodejs_version: [20]
         os: [ubuntu-latest]
         exclude:
           - nodejs_version: 18
