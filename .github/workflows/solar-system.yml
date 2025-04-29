@@ -123,6 +123,7 @@ jobs:
     - name: Docker Image Testing
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: study/demo-repo
       run: |
         docker images
         docker run --name solar-system-app -d \
