@@ -16,7 +16,7 @@ env:
   MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
   REPOSITORY: study/demo-repo
-  EKS_CLUSTER_NAME: 'demo-eks-cluster'
+  EKS_CLUSTER_NAME: 'demo-eks'
   # REGISTRY: '851725514760.dkr.ecr.ap-south-1.amazonaws.com'
 
 jobs:
@@ -121,7 +121,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v4
       with:
         audience: sts.amazonaws.com
-        aws-region: ap-south-1
+        aws-region: us-east-1
         # role-to-assume: arn:aws:iam::992293216837:role/github-action-oidc-Role-xta7NbBBHjdI
         aws-access-key-id: ${{ vars.ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.SECRET_KEY }}
@@ -131,13 +131,6 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
       with:
         mask-password: true
-
-    - name: Login to GHCR
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ github.token}}
 
     - name: Build, and tag docker image.
       env:
@@ -187,7 +180,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v4
       with:
         audience: sts.amazonaws.com
-        aws-region: ap-south-1
+        aws-region: us-east-1
         # role-to-assume: arn:aws:iam::992293216837:role/github-action-oidc-Role-xta7NbBBHjdI
         aws-access-key-id: ${{ vars.ACCESS_KEY }}
         aws-secret-access-key: ${{ secrets.SECRET_KEY }}
