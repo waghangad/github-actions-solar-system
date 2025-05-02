@@ -17,7 +17,8 @@ env:
   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
   REPOSITORY: study/demo-repo
   EKS_CLUSTER_NAME: 'demo-eks-cluster'
-  REGISTRY: '851725514760.dkr.ecr.ap-south-1.amazonaws.com'
+  # REGISTRY: '851725514760.dkr.ecr.ap-south-1.amazonaws.com'
+  REGISTRY: 'public.ecr.aws/m3x3f6f9/study/demo-repo'
 
 jobs:
   unit-testing:
