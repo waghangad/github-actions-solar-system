@@ -15,7 +15,7 @@ env:
   MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
   MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
-  REPOSITORY: solar-system
+  REPOSITORY: waghangad/solar-system
   EKS_CLUSTER_NAME: 'demo-eks'
   REGISTRY: 'ghcr.io'
 
