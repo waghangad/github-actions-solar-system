@@ -142,6 +142,8 @@ jobs:
         tags: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}
 
     - name: Test docker image
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       run: |
         docker images
         docker run --name solar-system-app -d \
@@ -158,6 +160,8 @@ jobs:
         wget -q -O - 127.0.0.1:3000/live | grep live
 
     - name: Push docker image.
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       uses: docker/build-push-action@v6
       with:
         context: .
