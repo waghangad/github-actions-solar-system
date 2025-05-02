@@ -17,7 +17,7 @@ env:
   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
   REPOSITORY: study/demo-repo
   EKS_CLUSTER_NAME: 'demo-eks-cluster'
-  REGISTRY: '992293216837.dkr.ecr.ap-south-1.amazonaws.com'
+# REGISTRY: '992293216837.dkr.ecr.ap-south-1.amazonaws.com'
 
 jobs:
   unit-testing:
@@ -122,7 +122,9 @@ jobs:
       with:
         audience: sts.amazonaws.com
         aws-region: ap-south-1
-        role-to-assume: arn:aws:iam::992293216837:role/github-action-oidc-Role-xta7NbBBHjdI
+        # role-to-assume: arn:aws:iam::992293216837:role/github-action-oidc-Role-xta7NbBBHjdI
+        aws-access-key-id: ${{ vars.ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SECRET_KEY }}
 
     - name: Login to Amazon ECR
       id: login-ecr
@@ -186,7 +188,15 @@ jobs:
       with:
         audience: sts.amazonaws.com
         aws-region: ap-south-1
-        role-to-assume: arn:aws:iam::992293216837:role/github-action-oidc-Role-xta7NbBBHjdI
+        # role-to-assume: arn:aws:iam::992293216837:role/github-action-oidc-Role-xta7NbBBHjdI
+        aws-access-key-id: ${{ vars.ACCESS_KEY }}
+        aws-secret-access-key: ${{ secrets.SECRET_KEY }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      with:
+        mask-password: true
         
     - name: Update kubeconfig for EKS
       run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }}
@@ -197,6 +207,7 @@ jobs:
         tokenSuffix: '_}_'
         files: '["kubernetes/development/*.yaml"]'
       env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         NAMESPACE: development
         REPLICAS: 2
         IMAGE: ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}
